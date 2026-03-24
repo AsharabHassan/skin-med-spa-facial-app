@@ -16,10 +16,8 @@ export default function GateScreen() {
   } = useForm<LeadFormData>({ resolver: zodResolver(leadSchema) });
 
   function onSubmit(data: LeadFormData) {
-    // Generate unique event ID for Meta CAPI deduplication
     const metaEventId = crypto.randomUUID();
 
-    // Collect Meta cookies for CAPI
     const getCookie = (name: string) => {
       const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
       return match ? match[2] : null;
@@ -27,7 +25,6 @@ export default function GateScreen() {
     const fbp = getCookie("_fbp");
     const fbc = getCookie("_fbc");
 
-    // Fire Meta Pixel Lead event client-side (for deduplication with CAPI)
     if (typeof window !== "undefined" && (window as any).fbq) {
       (window as any).fbq("track", "Lead", {}, { eventID: metaEventId });
     }
@@ -42,7 +39,6 @@ export default function GateScreen() {
         phone: data.phone,
         marketingConsent: data.marketingConsent,
         analysisResult: state.analysisResult,
-        // Meta CAPI fields
         metaEventId,
         metaEventSourceUrl: window.location.href,
         metaUserAgent: navigator.userAgent,
@@ -73,9 +69,9 @@ export default function GateScreen() {
             src={state.imageDataUrl}
             alt=""
             className="w-full h-full object-cover blur-3xl scale-110"
-            style={{ opacity: 0.08, filter: "grayscale(100%) blur(24px)" }}
+            style={{ opacity: 0.06, filter: "grayscale(100%) blur(24px)" }}
           />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #060509 0%, rgba(6,5,9,0.88) 100%)" }} />
+          <div className="absolute inset-0 bg-white/90" />
         </div>
       )}
 
@@ -88,15 +84,15 @@ export default function GateScreen() {
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 border border-gold/40 flex items-center justify-center flex-shrink-0">
-              <span className="font-mono text-[10px] text-gold font-bold">✓</span>
+            <div className="w-8 h-8 border border-pink/40 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="font-mono text-[10px] text-pink font-bold">✓</span>
             </div>
-            <div className="h-px flex-1 bg-gold/20" />
+            <div className="h-px flex-1 bg-pink/20" />
           </div>
-          <h2 className="font-serif text-[3.2rem] font-normal italic text-cream leading-[1.0]">
+          <h2 className="font-heading text-[2.8rem] font-light text-dark leading-[1.0]">
             Your Analysis<br />Is Ready.
           </h2>
-          <p className="font-mono text-[8px] text-white/30 tracking-[0.3em] uppercase">
+          <p className="font-mono text-[9px] text-gray tracking-[0.2em] uppercase">
             Enter details to unlock your report
           </p>
         </div>
@@ -107,46 +103,46 @@ export default function GateScreen() {
             <div className="space-y-1.5">
               <label className="label-xs">First Name</label>
               <input {...register("firstName")} placeholder="Sarah" className="input-field" />
-              {errors.firstName && <p className="font-mono text-[9px] text-red-400/60 mt-1">{errors.firstName.message}</p>}
+              {errors.firstName && <p className="font-mono text-[9px] text-red-400 mt-1">{errors.firstName.message}</p>}
             </div>
             <div className="space-y-1.5">
               <label className="label-xs">Last Name</label>
               <input {...register("lastName")} placeholder="Johnson" className="input-field" />
-              {errors.lastName && <p className="font-mono text-[9px] text-red-400/60 mt-1">{errors.lastName.message}</p>}
+              {errors.lastName && <p className="font-mono text-[9px] text-red-400 mt-1">{errors.lastName.message}</p>}
             </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="label-xs">Email</label>
             <input {...register("email")} type="email" placeholder="sarah@example.com" className="input-field" />
-            {errors.email && <p className="font-mono text-[9px] text-red-400/60 mt-1">{errors.email.message}</p>}
+            {errors.email && <p className="font-mono text-[9px] text-red-400 mt-1">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-1.5">
             <label className="label-xs">Phone</label>
-            <input {...register("phone")} type="tel" placeholder="+44 7700 000000" className="input-field" />
-            {errors.phone && <p className="font-mono text-[9px] text-red-400/60 mt-1">{errors.phone.message}</p>}
+            <input {...register("phone")} type="tel" placeholder="+1 (555) 000-0000" className="input-field" />
+            {errors.phone && <p className="font-mono text-[9px] text-red-400 mt-1">{errors.phone.message}</p>}
           </div>
 
           {/* Consent checkbox */}
           <label className="flex items-start gap-3 cursor-pointer group">
             <div className="relative mt-0.5 flex-shrink-0">
               <input {...register("marketingConsent")} type="checkbox" className="sr-only peer" />
-              <div className="w-4 h-4 border border-white/20 peer-checked:border-gold peer-checked:bg-gold/15 transition-all duration-200" />
+              <div className="w-4 h-4 border border-gray-300 rounded peer-checked:border-pink peer-checked:bg-pink/10 transition-all duration-200" />
               <div className="absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100">
-                <span className="font-mono text-[9px] text-gold font-bold">✓</span>
+                <span className="font-mono text-[9px] text-pink font-bold">✓</span>
               </div>
             </div>
-            <span className="font-mono text-[9px] text-white/25 leading-relaxed group-hover:text-white/40 transition-colors">
-              I consent to receive my analysis results and aesthetic communications from Harley Street Aesthetics in accordance with UK data protection law.
+            <span className="font-mono text-[9px] text-gray leading-relaxed group-hover:text-dark transition-colors">
+              I consent to receive my analysis results and skincare communications from Skin Med Spa & Laser.
             </span>
           </label>
-          {errors.marketingConsent && <p className="font-mono text-[9px] text-red-400/60">{errors.marketingConsent.message}</p>}
+          {errors.marketingConsent && <p className="font-mono text-[9px] text-red-400">{errors.marketingConsent.message}</p>}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="btn-gold w-full disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-pink w-full"
           >
             {isSubmitting ? "Processing..." : "Unlock My Report →"}
           </button>
