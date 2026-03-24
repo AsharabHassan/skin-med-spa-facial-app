@@ -9,27 +9,11 @@
   }
 
   body {
-    background-color: #060509;
-    color: #EDE6D6;
-    font-family: var(--font-space-mono), monospace;
+    background-color: #FFFFFF;
+    color: #323232;
+    font-family: var(--font-body-serif), Georgia, serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-    /* Subtle technical grid */
-    background-image:
-      linear-gradient(rgba(196,152,64,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,152,64,0.03) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-
-  /* Film grain */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
-    opacity: 0.035;
-    pointer-events: none;
-    z-index: 9999;
   }
 }
 
@@ -38,106 +22,112 @@
     @apply min-h-screen max-w-md mx-auto flex flex-col px-6 py-10;
   }
 
-  /* Primary button — gold gradient, Space Mono */
-  .btn-gold {
-    @apply relative overflow-hidden font-mono font-bold text-obsidian uppercase transition-all duration-300 px-8 py-4 block;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    background: linear-gradient(180deg, #D4AE50 0%, #AA8020 100%);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 20px rgba(196,152,64,0.2);
+  /* Primary button — pink gradient */
+  .btn-pink {
+    @apply relative overflow-hidden font-heading font-semibold text-white uppercase transition-all duration-300 px-8 py-4 block text-center;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #F48FB1 0%, #DB7698 100%);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(244,143,177,0.3);
   }
 
-  .btn-gold::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%);
-    background-size: 200% 100%;
-    opacity: 0;
-    transition: opacity 0.3s;
+  .btn-pink:hover {
+    box-shadow: 0 6px 24px rgba(244,143,177,0.4);
+    transform: translateY(-1px);
   }
 
-  .btn-gold:hover::after {
-    opacity: 1;
-    animation: shimmer 0.6s ease forwards;
+  .btn-pink:active {
+    transform: scale(0.99);
   }
 
-  .btn-gold:active {
+  .btn-pink:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Teal button — membership CTA */
+  .btn-teal {
+    @apply relative overflow-hidden font-heading font-semibold text-white uppercase transition-all duration-300 px-8 py-4 block text-center;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #8ED4CC 0%, #6BC4BA 100%);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(142,212,204,0.3);
+  }
+
+  .btn-teal:hover {
+    box-shadow: 0 6px 24px rgba(142,212,204,0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-teal:active {
     transform: scale(0.99);
   }
 
   /* Outline button */
   .btn-outline {
-    @apply relative font-mono font-bold uppercase transition-all duration-300 px-8 py-4 block;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    border: 1px solid rgba(196,152,64,0.4);
-    color: rgba(196,152,64,0.8);
+    @apply relative font-heading font-semibold uppercase transition-all duration-300 px-8 py-4 block text-center;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    border: 1.5px solid #F48FB1;
+    color: #F48FB1;
     background: transparent;
+    border-radius: 8px;
   }
 
   .btn-outline:hover {
-    border-color: #C49840;
-    color: #C49840;
-    background: rgba(196,152,64,0.05);
+    background: rgba(244,143,177,0.05);
   }
 
   .btn-outline:active {
     transform: scale(0.99);
   }
 
-  /* Mono label */
+  /* Labels */
   .label-xs {
-    font-family: var(--font-space-mono), monospace;
-    font-size: 8px;
-    letter-spacing: 0.3em;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: rgba(196,152,64,0.55);
+    color: #9E9E9E;
     font-weight: 400;
   }
 
   /* Form inputs */
   .input-field {
-    @apply w-full bg-transparent py-3 font-mono font-normal focus:outline-none transition-colors duration-300;
-    font-size: 12px;
-    color: #EDE6D6;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    letter-spacing: 0.05em;
+    @apply w-full bg-transparent py-3 font-body focus:outline-none transition-colors duration-300;
+    font-size: 14px;
+    color: #323232;
+    border-bottom: 1px solid #e0e0e0;
+    letter-spacing: 0.02em;
   }
 
   .input-field::placeholder {
-    color: rgba(255,255,255,0.15);
+    color: #bbb;
   }
 
   .input-field:focus {
-    border-bottom-color: rgba(196,152,64,0.5);
+    border-bottom-color: #F48FB1;
   }
 
-  /* Card */
-  .card-dark {
-    background: rgba(17,14,9,0.8);
-    border: 1px solid rgba(196,152,64,0.08);
+  /* Severity pills */
+  .pill-healthy {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-white font-mono;
+    font-size: 9px;
+    background: #8ED4CC;
   }
 
-  /* Gold ornament line */
-  .gold-line {
-    display: block;
-    width: 40px;
-    height: 1px;
-    background: rgba(196,152,64,0.35);
-    margin: 0 auto;
+  .pill-mild {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-white font-mono;
+    font-size: 9px;
+    background: #F9A392;
   }
 
-  /* Horizontal rule with centre mark */
-  .ruled-line {
-    @apply flex items-center gap-3;
-  }
-
-  .ruled-line::before,
-  .ruled-line::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(196,152,64,0.2);
+  .pill-moderate {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-white font-mono;
+    font-size: 9px;
+    background: #DB7698;
   }
 }
