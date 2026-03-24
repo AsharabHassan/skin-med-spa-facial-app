@@ -1,27 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
-import { FILLER_ANALYSIS_PROMPT } from "@/lib/prompts";
+import { SKIN_ANALYSIS_PROMPT } from "@/lib/prompts";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const MAX_BASE64_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_BASE64_BYTES = 5 * 1024 * 1024;
 
-const faceZoneSchema = z.object({
+const skinDimensionSchema = z.object({
   id: z.number(),
   name: z.string(),
   concern: z.string(),
-  recommendation: z.string(),
-  severity: z.enum(["none", "mild", "moderate"]),
-  overlayRegion: z.enum(["forehead", "temples", "undereyes", "cheeks", "lips", "jawline"]),
+  severity: z.enum(["healthy", "mild", "moderate"]),
+  highlightAreas: z.array(z.string()),
+});
+
+const facialRecommendationSchema = z.object({
+  rank: z.number(),
+  facialName: z.string(),
+  matchReason: z.string(),
+  shortDescription: z.string(),
 });
 
 const analysisResultSchema = z.object({
-  faceShape: z.string(),
+  skinType: z.string(),
+  estimatedAgeRange: z.string(),
   overallSummary: z.string(),
-  zones: z.array(faceZoneSchema).length(6),
+  dimensions: z.array(skinDimensionSchema).length(5),
+  recommendations: z.array(facialRecommendationSchema).length(3),
 });
 
 export async function POST(req: NextRequest) {
@@ -59,7 +67,7 @@ export async function POST(req: NextRequest) {
             },
             {
               type: "text",
-              text: FILLER_ANALYSIS_PROMPT,
+              text: SKIN_ANALYSIS_PROMPT,
             },
           ],
         },
@@ -69,7 +77,6 @@ export async function POST(req: NextRequest) {
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Strip markdown code fences if Claude wraps the JSON (e.g. ```json ... ```)
     const cleanedText = responseText
       .trim()
       .replace(/^```(?:json)?\s*/i, "")
