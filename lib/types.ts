@@ -6,25 +6,27 @@ export type Screen =
   | "results"
   | "booking";
 
-export interface FaceZone {
+export interface SkinDimension {
   id: number;
   name: string;
   concern: string;
-  recommendation: string;
-  severity: "none" | "mild" | "moderate";
-  overlayRegion:
-    | "forehead"
-    | "temples"
-    | "undereyes"
-    | "cheeks"
-    | "lips"
-    | "jawline";
+  severity: "healthy" | "mild" | "moderate";
+  highlightAreas: string[];
 }
 
-export interface AnalysisResult {
-  faceShape: string;
+export interface FacialRecommendation {
+  rank: number;
+  facialName: string;
+  matchReason: string;
+  shortDescription: string;
+}
+
+export interface SkinAnalysisResult {
+  skinType: string;
+  estimatedAgeRange: string;
   overallSummary: string;
-  zones: FaceZone[];
+  dimensions: SkinDimension[];
+  recommendations: FacialRecommendation[];
 }
 
 export interface LeadData {
@@ -38,6 +40,7 @@ export interface LeadData {
 export interface AppState {
   screen: Screen;
   imageDataUrl: string | null;
-  analysisResult: AnalysisResult | null;
+  analysisResult: SkinAnalysisResult | null;
   leadData: LeadData | null;
+  membershipPopupShown: boolean;
 }
