@@ -18,43 +18,40 @@ export default function LandingScreen() {
 
   return (
     <div className="screen justify-between relative overflow-hidden">
-
-      {/* Top — logo */}
       <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col gap-6 w-full pt-2">
-        <motion.div variants={item} className="flex items-center justify-between w-full">
-          <Image src="/logo.svg" alt="HSA" width={52} height={52} priority />
-          <span className="label-xs">Est. Harley Street</span>
+        {/* Logo */}
+        <motion.div variants={item} className="flex items-center justify-center w-full">
+          <Image src="/logo.png" alt="Skin Med Spa & Laser" width={180} height={80} priority />
         </motion.div>
 
         {/* Thin rule */}
-        <motion.div variants={item} className="w-full h-px bg-gold/20" />
+        <motion.div variants={item} className="w-10 h-px bg-pink mx-auto opacity-40" />
 
         {/* Hero headline */}
-        <motion.div variants={item} className="space-y-0">
-          <p className="label-xs mb-3">AI Facial Analysis</p>
-          <h1 className="font-serif text-[3.8rem] font-normal leading-[0.95] text-cream italic tracking-tight">
-            Reveal<br />Your<br />Aesthetic<br />Potential.
+        <motion.div variants={item} className="space-y-2 text-center">
+          <p className="label-xs">AI Skin Analysis</p>
+          <h1 className="font-heading text-[2.8rem] font-light leading-[0.95] text-dark tracking-tight">
+            Discover Your<br /><span className="text-pink">Perfect Facial.</span>
           </h1>
         </motion.div>
 
-        {/* Feature rows — Space Mono data table */}
+        {/* Feature rows */}
         <motion.div variants={item} className="w-full mt-2">
           {[
-            { code: "001", label: "Facial Structure Analysis" },
-            { code: "002", label: "6-Zone Deep Assessment" },
-            { code: "003", label: "Free Online Consultation" },
+            { code: "01", label: "Skin Condition Analysis" },
+            { code: "02", label: "Personalized Facial Match" },
+            { code: "03", label: "Free Online Consultation" },
           ].map(({ code, label }) => (
-            <div key={code} className="flex items-center gap-4 py-3 border-b border-gold/10 first:border-t">
-              <span className="font-mono text-[9px] text-gold/40 w-7 flex-shrink-0">{code}</span>
-              <div className="w-px h-3 bg-gold/15 flex-shrink-0" />
-              <span className="font-mono text-[10px] text-cream/50 tracking-wide">{label}</span>
-              <span className="ml-auto font-mono text-[8px] text-gold/25">●</span>
+            <div key={code} className="flex items-center gap-4 py-3 border-b border-gray-100 first:border-t">
+              <span className="font-mono text-[9px] text-pink w-5 flex-shrink-0">{code}</span>
+              <div className="w-px h-3 bg-gray-200 flex-shrink-0" />
+              <span className="font-mono text-[11px] text-gray tracking-wide">{label}</span>
             </div>
           ))}
         </motion.div>
       </motion.div>
 
-      {/* Bottom — CTA */}
+      {/* Bottom CTA */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -62,12 +59,12 @@ export default function LandingScreen() {
         className="w-full space-y-3 pb-4"
       >
         <button
-          className="btn-gold w-full"
+          className="btn-pink w-full"
           onClick={() => dispatch({ type: "SET_SCREEN", screen: "capture" })}
         >
           Begin Analysis →
         </button>
-        <p className="font-mono text-[8px] text-center text-white/20 tracking-widest">
+        <p className="font-mono text-[8px] text-center text-gray-300 tracking-widest">
           PRIVATE · SECURE · IMAGE NOT STORED
         </p>
       </motion.div>
