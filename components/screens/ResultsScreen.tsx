@@ -1,15 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/lib/store";
-// import FaceOverlay from "@/components/FaceOverlay"; // removed in Task 1 fork
-// import ZoneCard from "@/components/ZoneCard"; // removed in Task 1 fork
+import MembershipPopup from "@/components/MembershipPopup";
+
+const SEVERITY_PILL: Record<string, string> = {
+  healthy: "pill-healthy",
+  mild: "pill-mild",
+  moderate: "pill-moderate",
+};
+
+const RANK_LABELS = ["BEST MATCH", "ALSO GREAT", "CONSIDER"];
 
 export default function ResultsScreen() {
   const { state, dispatch } = useApp();
-  const [activeZoneId, setActiveZoneId] = useState<number | null>(null);
-  const { analysisResult, imageDataUrl, leadData } = state;
+  const { analysisResult, imageDataUrl, leadData, membershipPopupShown } = state;
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    if (membershipPopupShown) return;
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+      dispatch({ type: "SHOW_MEMBERSHIP_POPUP" });
+    }, 5000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!analysisResult || !imageDataUrl) {
     dispatch({ type: "SET_SCREEN", screen: "landing" });
@@ -25,57 +42,96 @@ export default function ResultsScreen() {
         className="w-full space-y-6"
       >
         {/* Report header */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="label-xs">Facial Analysis Report</span>
-            <span className="font-mono text-[8px] text-gold/30 tracking-wider">
-              {analysisResult.faceShape?.toUpperCase()} FACE
+            <span className="label-xs">Skin Analysis Report</span>
+            <span className="font-mono text-[9px] text-gray/40 tracking-wider uppercase">
+              {analysisResult.skinType} skin
             </span>
           </div>
-          <div className="w-full h-px bg-gold/15" />
-          <h2 className="font-serif text-[2.8rem] font-normal italic text-cream leading-[1.0]">
+          <div className="w-full h-px bg-gray-100" />
+          <h2 className="font-heading text-[2.6rem] font-light text-dark leading-[1.0]">
             {leadData?.firstName ? `${leadData.firstName}'s` : "Your"}<br />
-            Assessment.
+            <span className="text-pink">Assessment.</span>
           </h2>
         </div>
 
-        {/* Photo with overlay — FaceOverlay removed in Task 1 fork, replaced in Task 15 */}
+        {/* Photo */}
         <div className="relative">
-          {/* FaceOverlay placeholder */}
-          <div className="mt-2 flex items-center justify-between">
-            <span className="font-mono text-[8px] text-white/20 tracking-widest">TAP ZONE TO INSPECT</span>
-            <span className="font-mono text-[8px] text-gold/30">{analysisResult.zones.length} ZONES</span>
-          </div>
+          <img
+            src={imageDataUrl}
+            alt="Your selfie"
+            className="w-full rounded-2xl"
+          />
         </div>
 
         {/* AI summary */}
-        <div className="border-l-2 border-gold/30 pl-4 py-1 space-y-1.5">
+        <div className="border-l-2 border-pink/30 pl-4 py-1 space-y-1.5">
           <p className="label-xs">Specialist Assessment</p>
-          <p className="font-serif text-[1.05rem] italic text-cream/70 leading-relaxed">
+          <p className="font-body text-[0.95rem] text-dark/70 leading-relaxed">
             {analysisResult.overallSummary}
           </p>
         </div>
 
-        {/* Zone cards — ZoneCard removed in Task 1 fork, replaced in Task 15 */}
-        <div className="space-y-1">
-          <p className="label-xs mb-3">Zone Breakdown</p>
-          {/* ZoneCard placeholder */}
+        {/* Skin Profile — dimensions */}
+        <div className="space-y-2">
+          <p className="label-xs mb-3">Skin Profile</p>
+          {analysisResult.dimensions.map((dim) => (
+            <div key={dim.id} className="flex items-center justify-between py-2 border-b border-gray-50">
+              <span className="font-mono text-[11px] text-dark/70">{dim.name}</span>
+              <span className={SEVERITY_PILL[dim.severity]}>{dim.severity}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Recommendations */}
+        <div className="space-y-3">
+          <p className="label-xs mb-3">Recommended For You</p>
+          {analysisResult.recommendations.map((rec, i) => (
+            <div
+              key={rec.rank}
+              className={`rounded-xl p-4 ${i === 0 ? "bg-blush border-l-[3px] border-pink" : "bg-gray-50"}`}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <p className={`font-mono text-[9px] tracking-wider mb-1 ${i === 0 ? "text-pink font-semibold" : "text-gray"}`}>
+                    {RANK_LABELS[i]}
+                  </p>
+                  <p className="font-heading text-[1rem] font-semibold text-dark">{rec.facialName}</p>
+                  <p className="font-mono text-[10px] text-gray mt-1">{rec.shortDescription}</p>
+                  <p className="font-body text-[11px] text-dark/50 mt-1.5 leading-relaxed">{rec.matchReason}</p>
+                </div>
+                <span className="font-heading text-[0.85rem] font-semibold text-dark flex-shrink-0 ml-3">from $99</span>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Disclaimer */}
-        <p className="font-mono text-[8px] text-white/15 text-center leading-relaxed tracking-wide">
+        <p className="font-mono text-[8px] text-gray-300 text-center leading-relaxed tracking-wide">
           AI-GENERATED · FOR INFORMATIONAL PURPOSES ONLY<br />
           TREATMENT PLANS CONFIRMED AT CONSULTATION
         </p>
 
         {/* CTA */}
         <button
-          className="btn-gold w-full"
+          className="btn-pink w-full"
           onClick={() => dispatch({ type: "SET_SCREEN", screen: "booking" })}
         >
-          Book Free Online Consultation →
+          Book Free Consultation →
         </button>
       </motion.div>
+
+      {/* Membership popup */}
+      {showPopup && (
+        <MembershipPopup
+          onDismiss={() => setShowPopup(false)}
+          onAccept={() => {
+            setShowPopup(false);
+            dispatch({ type: "SET_SCREEN", screen: "booking" });
+          }}
+        />
+      )}
     </div>
   );
 }
