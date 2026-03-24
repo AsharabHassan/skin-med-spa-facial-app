@@ -9,26 +9,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        gold: {
-          DEFAULT: "#C49840",
-          light: "#D4B060",
-          dark: "#9A7628",
+        pink: {
+          DEFAULT: "#F48FB1",
+          dark: "#DB7698",
         },
-        cream: "#EDE6D6",
-        obsidian: "#060509",
-        parchment: "#110E09",
+        coral: "#F9A392",
+        teal: {
+          DEFAULT: "#8ED4CC",
+          dark: "#6BC4BA",
+        },
+        dark: "#323232",
+        gray: {
+          DEFAULT: "#9E9E9E",
+        },
+        blush: "#FFF0F5",
       },
       fontFamily: {
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
-        sans:  ["var(--font-space-mono)", "monospace"],
-        mono:  ["var(--font-space-mono)", "monospace"],
+        heading: ["var(--font-raleway)", "sans-serif"],
+        body: ["var(--font-body-serif)", "Georgia", "serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "monospace"],
       },
       animation: {
-        "scan":       "scan 2.8s ease-in-out infinite",
-        "scan-fast":  "scan 1.4s linear infinite",
-        "pulse-gold": "pulseGold 2.5s ease-in-out infinite",
-        "shimmer":    "shimmer 2s ease-in-out infinite",
-        "blink":      "blink 1s step-end infinite",
+        scan: "scan 2.8s ease-in-out infinite",
+        "pulse-pink": "pulsePink 2.5s ease-in-out infinite",
+        shimmer: "shimmer 2s ease-in-out infinite",
       },
       keyframes: {
         scan: {
@@ -37,17 +41,13 @@ const config: Config = {
           "90%":  { opacity: "1" },
           "100%": { transform: "translateY(900%)", opacity: "0" },
         },
-        pulseGold: {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(196,152,64,0)" },
-          "50%":      { boxShadow: "0 0 0 8px rgba(196,152,64,0.1)" },
+        pulsePink: {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(244,143,177,0)" },
+          "50%":      { boxShadow: "0 0 0 8px rgba(244,143,177,0.15)" },
         },
         shimmer: {
           "0%":   { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
-        },
-        blink: {
-          "0%, 100%": { opacity: "1" },
-          "50%":      { opacity: "0" },
         },
       },
     },
