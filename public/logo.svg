@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 80" fill="none">
+  <!-- Decorative outer ring -->
+  <ellipse cx="90" cy="40" rx="86" ry="36" stroke="#CEA336" stroke-width="0.5" opacity="0.4"/>
+  <!-- Inner ring -->
+  <ellipse cx="90" cy="40" rx="76" ry="28" stroke="#CEA336" stroke-width="0.25" opacity="0.25"/>
+  <!-- HSA monogram -->
+  <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"
+    font-family="Cormorant Garamond, Georgia, serif" font-size="28" font-weight="400"
+    fill="#CEA336" letter-spacing="12">HSA</text>
+</svg>

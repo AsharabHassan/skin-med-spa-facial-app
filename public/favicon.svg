@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" fill="#060509"/>
+  <ellipse cx="256" cy="256" rx="240" ry="240" stroke="#CEA336" stroke-width="3" opacity="0.5"/>
+  <ellipse cx="256" cy="256" rx="210" ry="210" stroke="#CEA336" stroke-width="1.5" opacity="0.3"/>
+  <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle"
+    font-family="Georgia, serif" font-size="140" font-weight="400"
+    fill="#CEA336" letter-spacing="18">HSA</text>
+</svg>
