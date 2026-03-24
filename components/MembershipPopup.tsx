@@ -72,7 +72,7 @@ export default function MembershipPopup({ onDismiss, onAccept }: Props) {
           className="w-full text-center font-mono text-[11px] text-gray hover:text-dark transition-colors py-2"
           onClick={onDismiss}
         >
-          No thanks, continue to booking
+          No thanks
         </button>
       </motion.div>
     </motion.div>
