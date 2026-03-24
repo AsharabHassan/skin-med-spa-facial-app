@@ -1,13 +1,14 @@
 "use client";
 
 import { createContext, useContext, useReducer, ReactNode } from "react";
-import { AppState, Screen, AnalysisResult, LeadData } from "./types";
+import { AppState, Screen, SkinAnalysisResult, LeadData } from "./types";
 
 type Action =
   | { type: "SET_SCREEN"; screen: Screen }
   | { type: "SET_IMAGE"; imageDataUrl: string }
-  | { type: "SET_ANALYSIS"; result: AnalysisResult }
+  | { type: "SET_ANALYSIS"; result: SkinAnalysisResult }
   | { type: "SET_LEAD"; lead: LeadData }
+  | { type: "SHOW_MEMBERSHIP_POPUP" }
   | { type: "RESET" };
 
 const initialState: AppState = {
@@ -15,6 +16,7 @@ const initialState: AppState = {
   imageDataUrl: null,
   analysisResult: null,
   leadData: null,
+  membershipPopupShown: false,
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -27,6 +29,8 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, analysisResult: action.result };
     case "SET_LEAD":
       return { ...state, leadData: action.lead };
+    case "SHOW_MEMBERSHIP_POPUP":
+      return { ...state, membershipPopupShown: true };
     case "RESET":
       return initialState;
     default:
