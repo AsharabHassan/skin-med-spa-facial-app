@@ -17,13 +17,15 @@ export default function CheckoutScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const topRec = state.analysisResult?.recommendations?.[0];
-  const facial = topRec ? findPricing(topRec.facialName) : undefined;
+  const facialMaybe = topRec ? findPricing(topRec.facialName) : undefined;
 
-  if (!facial || !state.leadData) {
+  if (!facialMaybe || !state.leadData) {
     dispatch({ type: "SET_SCREEN", screen: "results" });
     return null;
   }
 
+  // Narrowed: facialMaybe is FacialPricing here
+  const facial = facialMaybe;
   const total = calcTotal(facial.price);
 
   function handleDateTimeSelect(date: string, time: string) {

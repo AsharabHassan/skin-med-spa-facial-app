@@ -137,7 +137,7 @@ export default function ResultsScreen() {
           onDismiss={() => setShowPopup(false)}
           onAccept={() => {
             setShowPopup(false);
-            dispatch({ type: "SET_SCREEN", screen: "booking" });
+            dispatch({ type: "SET_SCREEN", screen: "checkout" });
           }}
         />
       )}

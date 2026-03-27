@@ -7,18 +7,20 @@ import CaptureScreen from "@/components/screens/CaptureScreen";
 import AnalyzingScreen from "@/components/screens/AnalyzingScreen";
 import GateScreen from "@/components/screens/GateScreen";
 import ResultsScreen from "@/components/screens/ResultsScreen";
-import BookingScreen from "@/components/screens/BookingScreen";
+import CheckoutScreen from "@/components/screens/CheckoutScreen";
+import ConfirmationScreen from "@/components/screens/ConfirmationScreen";
 
 function ScreenRouter() {
   const { state } = useApp();
 
   const screens = {
-    landing:   <LandingScreen />,
-    capture:   <CaptureScreen />,
-    analyzing: <AnalyzingScreen />,
-    gate:      <GateScreen />,
-    results:   <ResultsScreen />,
-    booking:   <BookingScreen />,
+    landing:      <LandingScreen />,
+    capture:      <CaptureScreen />,
+    analyzing:    <AnalyzingScreen />,
+    gate:         <GateScreen />,
+    results:      <ResultsScreen />,
+    checkout:     <CheckoutScreen />,
+    confirmation: <ConfirmationScreen />,
   };
 
   return (

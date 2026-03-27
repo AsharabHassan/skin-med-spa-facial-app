@@ -4,7 +4,6 @@ export type Screen =
   | "analyzing"
   | "gate"
   | "results"
-  | "booking"
   | "checkout"
   | "confirmation";
 
