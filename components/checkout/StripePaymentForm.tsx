@@ -88,6 +88,7 @@ function PaymentForm({ totalInCents, facialId, selectedDate, selectedTime, leadD
           date: selectedDate,
           time: selectedTime,
           ghlContactId,
+          lead: leadData,
         }),
       });
 

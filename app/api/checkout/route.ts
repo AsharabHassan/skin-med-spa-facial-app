@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { findOrCreateContact, getAvailableSlots } from "@/lib/ghl";
+import { findOrCreateContact } from "@/lib/ghl";
+import { isSlotAvailable } from "@/lib/zenoti";
 import { FACIAL_PRICING, calcTotal } from "@/lib/pricing";
 
 function getStripeClient() {
@@ -24,9 +25,8 @@ export async function POST(req: NextRequest) {
     }
     const amount = calcTotal(facial.price);
 
-    const slots = await getAvailableSlots(date, date);
-    const daySlots = slots.find((d) => d.date === date);
-    if (!daySlots || !daySlots.slots.includes(time)) {
+    const slotOpen = await isSlotAvailable(date, time);
+    if (!slotOpen) {
       return NextResponse.json({ error: "This time slot is no longer available" }, { status: 409 });
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createAppointment, updateContact, triggerWorkflow } from "@/lib/ghl";
+import { updateContact, triggerWorkflow } from "@/lib/ghl";
+import { createAppointment } from "@/lib/zenoti";
 import { FACIAL_PRICING, convertTo24h } from "@/lib/pricing";
 
 function getStripeClient() {
@@ -12,7 +13,7 @@ function getStripeClient() {
 export async function POST(req: NextRequest) {
   const stripe = getStripeClient();
   try {
-    const { paymentIntentId, facialId, date, time, ghlContactId } = await req.json();
+    const { paymentIntentId, facialId, date, time, ghlContactId, lead } = await req.json();
 
     if (!paymentIntentId || !facialId || !date || !time || !ghlContactId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -43,9 +44,15 @@ export async function POST(req: NextRequest) {
       const startTime = new Date(`${date}T${convertTo24h(time)}`).toISOString();
 
       const appointment = await createAppointment({
-        contactId: ghlContactId,
         startTime,
-        title: `${facialName} - Paid`,
+        serviceName: facialName,
+        notes: `${facialName} - Paid via Stripe (${paymentIntentId})`,
+        guest: lead ? {
+          firstName: lead.firstName,
+          lastName: lead.lastName,
+          email: lead.email,
+          phone: lead.phone,
+        } : undefined,
       });
       appointmentId = appointment.id;
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAvailableSlots } from "@/lib/ghl";
+import { getAvailableSlots } from "@/lib/zenoti";
 
 export async function GET(req: NextRequest) {
   try {
