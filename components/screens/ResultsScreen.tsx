@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/lib/store";
 import MembershipPopup from "@/components/MembershipPopup";
+import VideoTestimonials from "@/components/trust/VideoTestimonials";
+import ClinicPhotoGrid from "@/components/trust/ClinicPhotoGrid";
+import DistanceDisplay from "@/components/trust/DistanceDisplay";
 
 const SEVERITY_PILL: Record<string, string> = {
   healthy: "pill-healthy",
@@ -107,6 +110,12 @@ export default function ResultsScreen() {
           ))}
         </div>
 
+        {/* Trust elements */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-pink to-transparent my-2" />
+        <VideoTestimonials />
+        <ClinicPhotoGrid />
+        <DistanceDisplay />
+
         {/* Disclaimer */}
         <p className="font-mono text-[8px] text-gray-300 text-center leading-relaxed tracking-wide">
           AI-GENERATED · FOR INFORMATIONAL PURPOSES ONLY<br />
@@ -116,9 +125,9 @@ export default function ResultsScreen() {
         {/* CTA */}
         <button
           className="btn-pink w-full"
-          onClick={() => dispatch({ type: "SET_SCREEN", screen: "booking" })}
+          onClick={() => dispatch({ type: "SET_SCREEN", screen: "checkout" })}
         >
-          Book Free Consultation →
+          Proceed to Checkout →
         </button>
       </motion.div>
 
