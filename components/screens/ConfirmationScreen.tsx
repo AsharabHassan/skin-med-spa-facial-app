@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useApp } from "@/lib/store";
-import { formatCents } from "@/lib/pricing";
+import { formatCents, convertTo24h } from "@/lib/pricing";
 
 function generateICS(facialName: string, date: string, time: string): string {
   const startDate = new Date(`${date}T${convertTo24h(time)}`);
@@ -23,17 +23,6 @@ function generateICS(facialName: string, date: string, time: string): string {
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");
-}
-
-function convertTo24h(timeStr: string): string {
-  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!match) return "09:00:00";
-  let hours = parseInt(match[1], 10);
-  const minutes = match[2];
-  const period = match[3].toUpperCase();
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  return `${hours.toString().padStart(2, "0")}:${minutes}:00`;
 }
 
 export default function ConfirmationScreen() {

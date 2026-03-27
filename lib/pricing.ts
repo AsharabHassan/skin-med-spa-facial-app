@@ -39,3 +39,15 @@ export function calcTotal(priceInCents: number): number {
 export function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
+
+/** Convert "10:30 AM" → "10:30:00" (24h format) */
+export function convertTo24h(timeStr: string): string {
+  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return "09:00:00";
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+  if (period === "PM" && hours !== 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+  return `${hours.toString().padStart(2, "0")}:${minutes}:00`;
+}

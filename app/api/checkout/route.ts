@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { findOrCreateContact, getAvailableSlots } from "@/lib/ghl";
+import { FACIAL_PRICING, calcTotal } from "@/lib/pricing";
 
 function getStripeClient() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -11,11 +12,17 @@ function getStripeClient() {
 export async function POST(req: NextRequest) {
   const stripe = getStripeClient();
   try {
-    const { facialId, date, time, amount, lead } = await req.json();
+    const { facialId, date, time, lead } = await req.json();
 
-    if (!facialId || !date || !time || !amount || !lead) {
+    if (!facialId || !date || !time || !lead) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    const facial = FACIAL_PRICING.find((f) => f.facialId === facialId);
+    if (!facial) {
+      return NextResponse.json({ error: "Unknown facial" }, { status: 400 });
+    }
+    const amount = calcTotal(facial.price);
 
     const slots = await getAvailableSlots(date, date);
     const daySlots = slots.find((d) => d.date === date);

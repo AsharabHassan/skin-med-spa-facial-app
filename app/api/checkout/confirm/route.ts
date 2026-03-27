@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createAppointment, updateContact, triggerWorkflow } from "@/lib/ghl";
-import { FACIAL_PRICING } from "@/lib/pricing";
+import { FACIAL_PRICING, convertTo24h } from "@/lib/pricing";
 
 function getStripeClient() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -81,13 +81,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function convertTo24h(timeStr: string): string {
-  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!match) return "09:00:00";
-  let hours = parseInt(match[1], 10);
-  const minutes = match[2];
-  const period = match[3].toUpperCase();
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  return `${hours.toString().padStart(2, "0")}:${minutes}:00`;
-}

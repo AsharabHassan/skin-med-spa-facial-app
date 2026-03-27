@@ -13,6 +13,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "lat and lng required" }, { status: 400 });
     }
 
+    const latNum = parseFloat(lat);
+    const lngNum = parseFloat(lng);
+    if (isNaN(latNum) || isNaN(lngNum) || latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
+      return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
+    }
+
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
       return NextResponse.json(null, { status: 500 });
@@ -36,7 +42,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(null, { status: 200 });
     }
 
-    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=400x120&scale=2&markers=color:red%7C${CLINIC_LAT},${CLINIC_LNG}&markers=color:blue%7C${lat},${lng}&path=enc:&key=${apiKey}`;
+    const staticMapUrl = `/api/static-map?userLat=${lat}&userLng=${lng}`;
 
     return NextResponse.json({
       durationText: element.duration.text,

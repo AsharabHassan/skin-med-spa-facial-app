@@ -7,6 +7,7 @@ import MembershipPopup from "@/components/MembershipPopup";
 import VideoTestimonials from "@/components/trust/VideoTestimonials";
 import ClinicPhotoGrid from "@/components/trust/ClinicPhotoGrid";
 import DistanceDisplay from "@/components/trust/DistanceDisplay";
+import { findPricing, formatCents } from "@/lib/pricing";
 
 const SEVERITY_PILL: Record<string, string> = {
   healthy: "pill-healthy",
@@ -104,7 +105,9 @@ export default function ResultsScreen() {
                   <p className="font-mono text-[10px] text-gray mt-1">{rec.shortDescription}</p>
                   <p className="font-body text-[11px] text-dark/50 mt-1.5 leading-relaxed">{rec.matchReason}</p>
                 </div>
-                <span className="font-heading text-[0.85rem] font-semibold text-dark flex-shrink-0 ml-3">from $99</span>
+                <span className="font-heading text-[0.85rem] font-semibold text-dark flex-shrink-0 ml-3">
+                  {(() => { const p = findPricing(rec.facialName); return p ? formatCents(p.price) : ""; })()}
+                </span>
               </div>
             </div>
           ))}

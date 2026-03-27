@@ -29,6 +29,9 @@ export default function CheckoutScreen() {
   const total = calcTotal(facial.price);
 
   function handleDateTimeSelect(date: string, time: string) {
+    if (date !== selectedDate) {
+      setSelectedTime(null);
+    }
     setSelectedDate(date);
     if (time) setSelectedTime(time);
     setError(null);
