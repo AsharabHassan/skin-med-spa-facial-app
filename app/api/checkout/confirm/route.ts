@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { updateContact, triggerWorkflow } from "@/lib/ghl";
-import { createAppointment } from "@/lib/zenoti";
-import { FACIAL_PRICING, convertTo24h } from "@/lib/pricing";
+import { createAppointment, confirmReservedBooking } from "@/lib/zenoti";
+import { FACIAL_PRICING } from "@/lib/pricing";
 
 function getStripeClient() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -13,9 +13,9 @@ function getStripeClient() {
 export async function POST(req: NextRequest) {
   const stripe = getStripeClient();
   try {
-    const { paymentIntentId, facialId, date, time, ghlContactId, lead } = await req.json();
+    const { paymentIntentId, facialId, date, time, ghlContactId, lead, bookingId } = await req.json();
 
-    if (!paymentIntentId || !facialId || !date || !time || !ghlContactId) {
+    if (!paymentIntentId || !facialId || !date || !time) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -40,41 +40,53 @@ export async function POST(req: NextRequest) {
 
     let appointmentId = "";
 
+    // Step 1: Confirm Zenoti booking (critical — must succeed)
     try {
-      const startTime = new Date(`${date}T${convertTo24h(time)}`).toISOString();
-
-      const appointment = await createAppointment({
-        startTime,
-        serviceName: facialName,
-        notes: `${facialName} - Paid via Stripe (${paymentIntentId})`,
-        guest: lead ? {
-          firstName: lead.firstName,
-          lastName: lead.lastName,
-          email: lead.email,
-          phone: lead.phone,
-        } : undefined,
-      });
-      appointmentId = appointment.id;
-
-      await updateContact(ghlContactId, {
-        last_payment_amount: (paymentIntent.amount / 100).toFixed(2),
-        last_payment_date: new Date().toISOString(),
-        last_facial_booked: facialName,
-        stripe_payment_id: paymentIntentId,
-      });
-
-      const workflowId = process.env.GHL_PAYMENT_WORKFLOW_ID;
-      if (workflowId) {
-        await triggerWorkflow(workflowId, ghlContactId);
+      if (bookingId) {
+        await confirmReservedBooking(bookingId);
+        appointmentId = bookingId;
+      } else {
+        if (!lead) throw new Error("Lead data required for Zenoti booking");
+        const appointment = await createAppointment({
+          date,
+          time,
+          serviceName: facialName,
+          guest: {
+            firstName: lead.firstName,
+            lastName: lead.lastName,
+            email: lead.email,
+            phone: lead.phone,
+          },
+        });
+        appointmentId = appointment.id;
       }
-    } catch (ghlError) {
-      console.error("GHL error (payment already succeeded):", ghlError);
+    } catch (zenotiError) {
+      console.error("Zenoti confirm error (payment already succeeded):", zenotiError);
+      // Payment went through but booking confirmation failed — flag for manual follow-up
       return NextResponse.json({
         confirmationNumber: "PENDING",
         appointmentId: "",
         cardLast4,
         warning: "Payment received but booking needs manual confirmation. We will contact you.",
       }, { status: 207 });
+    }
+
+    // Step 2: GHL update — non-blocking, never fails the response
+    try {
+      if (ghlContactId) {
+        await updateContact(ghlContactId, {
+          last_payment_amount: (paymentIntent.amount / 100).toFixed(2),
+          last_payment_date: new Date().toISOString(),
+          last_facial_booked: facialName,
+          stripe_payment_id: paymentIntentId,
+        });
+        const workflowId = process.env.GHL_PAYMENT_WORKFLOW_ID;
+        if (workflowId) {
+          await triggerWorkflow(workflowId, ghlContactId);
+        }
+      }
+    } catch (ghlError) {
+      console.error("GHL update (non-fatal, booking confirmed):", ghlError);
     }
 
     return NextResponse.json({

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/lib/store";
 import { formatCents, convertTo24h } from "@/lib/pricing";
@@ -29,10 +30,13 @@ export default function ConfirmationScreen() {
   const { state, dispatch } = useApp();
   const { bookingConfirmation } = state;
 
-  if (!bookingConfirmation) {
-    dispatch({ type: "SET_SCREEN", screen: "landing" });
-    return null;
-  }
+  useEffect(() => {
+    if (!bookingConfirmation) {
+      dispatch({ type: "SET_SCREEN", screen: "landing" });
+    }
+  }, [bookingConfirmation, dispatch]);
+
+  if (!bookingConfirmation) return null;
 
   const isPending = bookingConfirmation.confirmationNumber === "PENDING";
 

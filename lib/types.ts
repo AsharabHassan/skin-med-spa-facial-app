@@ -44,6 +44,7 @@ export interface AppState {
   analysisResult: SkinAnalysisResult | null;
   leadData: LeadData | null;
   membershipPopupShown: boolean;
+  selectedRecommendationIndex: number;
   checkoutData: CheckoutData | null;
   bookingConfirmation: BookingConfirmation | null;
 }

@@ -19,7 +19,7 @@ const RANK_LABELS = ["BEST MATCH", "ALSO GREAT", "CONSIDER"];
 
 export default function ResultsScreen() {
   const { state, dispatch } = useApp();
-  const { analysisResult, imageDataUrl, leadData, membershipPopupShown } = state;
+  const { analysisResult, imageDataUrl, leadData, membershipPopupShown, selectedRecommendationIndex } = state;
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -32,10 +32,13 @@ export default function ResultsScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!analysisResult || !imageDataUrl) {
-    dispatch({ type: "SET_SCREEN", screen: "landing" });
-    return null;
-  }
+  useEffect(() => {
+    if (!analysisResult || !imageDataUrl) {
+      dispatch({ type: "SET_SCREEN", screen: "landing" });
+    }
+  }, [analysisResult, imageDataUrl, dispatch]);
+
+  if (!analysisResult || !imageDataUrl) return null;
 
   return (
     <div className="screen pb-12">
@@ -90,27 +93,50 @@ export default function ResultsScreen() {
 
         {/* Recommendations */}
         <div className="space-y-3">
-          <p className="label-xs mb-3">Recommended For You</p>
-          {analysisResult.recommendations.map((rec, i) => (
-            <div
-              key={rec.rank}
-              className={`rounded-xl p-4 ${i === 0 ? "bg-blush border-l-[3px] border-pink" : "bg-gray-50"}`}
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <p className={`font-mono text-[9px] tracking-wider mb-1 ${i === 0 ? "text-pink font-semibold" : "text-gray"}`}>
-                    {RANK_LABELS[i]}
-                  </p>
-                  <p className="font-heading text-[1rem] font-semibold text-dark">{rec.facialName}</p>
-                  <p className="font-mono text-[10px] text-gray mt-1">{rec.shortDescription}</p>
-                  <p className="font-body text-[11px] text-dark/50 mt-1.5 leading-relaxed">{rec.matchReason}</p>
+          <p className="label-xs mb-1">Recommended For You</p>
+          <p className="font-mono text-[10px] text-gray mb-3">Tap a treatment to select it, then proceed to checkout.</p>
+          {analysisResult.recommendations.map((rec, i) => {
+            const isSelected = i === selectedRecommendationIndex;
+            return (
+              <button
+                key={rec.rank}
+                onClick={() => dispatch({ type: "SET_SELECTED_RECOMMENDATION", index: i })}
+                className={`w-full text-left rounded-xl p-4 border-2 transition-all ${
+                  isSelected
+                    ? "bg-blush border-pink"
+                    : "bg-gray-50 border-transparent hover:border-pink/30"
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className={`font-mono text-[9px] tracking-wider ${isSelected ? "text-pink font-semibold" : "text-gray"}`}>
+                        {RANK_LABELS[i]}
+                      </p>
+                      {isSelected && (
+                        <span className="font-mono text-[8px] bg-pink text-white px-1.5 py-0.5 rounded-full tracking-wider">
+                          SELECTED
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-heading text-[1rem] font-semibold text-dark">{rec.facialName}</p>
+                    <p className="font-mono text-[10px] text-gray mt-1">{rec.shortDescription}</p>
+                    <p className="font-body text-[11px] text-dark/50 mt-1.5 leading-relaxed">{rec.matchReason}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
+                    <span className="font-heading text-[0.85rem] font-semibold text-dark">
+                      {(() => { const p = findPricing(rec.facialName); return p ? formatCents(p.price) : ""; })()}
+                    </span>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      isSelected ? "border-pink bg-pink" : "border-gray-300"
+                    }`}>
+                      {isSelected && <span className="text-white text-[10px]">✓</span>}
+                    </div>
+                  </div>
                 </div>
-                <span className="font-heading text-[0.85rem] font-semibold text-dark flex-shrink-0 ml-3">
-                  {(() => { const p = findPricing(rec.facialName); return p ? formatCents(p.price) : ""; })()}
-                </span>
-              </div>
-            </div>
-          ))}
+              </button>
+            );
+          })}
         </div>
 
         {/* Trust elements */}

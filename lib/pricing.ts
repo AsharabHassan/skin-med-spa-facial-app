@@ -19,10 +19,18 @@ export const FACIAL_PRICING: FacialPricing[] = [
   { facialId: "ultimate-bacial",             facialName: "Ultimate Bacial",                     price: 12500, duration: "45 min" },
 ];
 
-/** Look up pricing by exact facial name (case-insensitive) */
+/** Look up pricing by facial name — exact match first, then partial contains fallback */
 export function findPricing(facialName: string): FacialPricing | undefined {
   const lower = facialName.toLowerCase();
-  return FACIAL_PRICING.find((f) => f.facialName.toLowerCase() === lower);
+  // Exact match
+  const exact = FACIAL_PRICING.find((f) => f.facialName.toLowerCase() === lower);
+  if (exact) return exact;
+  // Partial match: pricing name contains the AI-returned name, or vice versa
+  return FACIAL_PRICING.find(
+    (f) =>
+      f.facialName.toLowerCase().includes(lower) ||
+      lower.includes(f.facialName.toLowerCase())
+  );
 }
 
 /** Calculate tax in cents */

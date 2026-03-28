@@ -37,9 +37,10 @@ export async function GET(req: NextRequest) {
 
     const data = await res.json();
     const element = data.rows?.[0]?.elements?.[0];
-
-    if (!element || element.status !== "OK") {
-      return NextResponse.json(null, { status: 200 });
+    console.log("Google Maps status:", data.status, "| element status:", element?.status);
+    if (data.status !== "OK" || !element || element.status !== "OK") {
+      console.error("Google Maps Distance Matrix failed:", JSON.stringify(data));
+      return NextResponse.json({ error: data.status ?? "NO_RESULT" }, { status: 200 });
     }
 
     const staticMapUrl = `/api/static-map?userLat=${lat}&userLng=${lng}`;

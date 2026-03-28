@@ -11,6 +11,7 @@ interface Props {
   selectedDate: string;
   selectedTime: string;
   leadData: { firstName: string; lastName: string; email: string; phone: string };
+  bookingId?: string;
   onSuccess: (confirmation: {
     confirmationNumber: string;
     appointmentId: string;
@@ -19,7 +20,7 @@ interface Props {
   onError: (message: string) => void;
 }
 
-function PaymentForm({ totalInCents, facialId, selectedDate, selectedTime, leadData, onSuccess, onError }: Props) {
+function PaymentForm({ totalInCents, facialId, selectedDate, selectedTime, leadData, bookingId, onSuccess, onError }: Props) {
   const stripe = useStripe();
   const elements = useElements();
   const [processing, setProcessing] = useState(false);
@@ -40,6 +41,7 @@ function PaymentForm({ totalInCents, facialId, selectedDate, selectedTime, leadD
           time: selectedTime,
           amount: totalInCents,
           lead: leadData,
+          bookingId: bookingId || undefined,
         }),
       });
 
@@ -54,7 +56,7 @@ function PaymentForm({ totalInCents, facialId, selectedDate, selectedTime, leadD
         return;
       }
 
-      const { clientSecret, ghlContactId } = await intentRes.json();
+      const { clientSecret, ghlContactId, bookingId: reservedBookingId } = await intentRes.json();
 
       const cardElement = elements.getElement(CardElement);
       if (!cardElement) {
@@ -89,6 +91,7 @@ function PaymentForm({ totalInCents, facialId, selectedDate, selectedTime, leadD
           time: selectedTime,
           ghlContactId,
           lead: leadData,
+          bookingId: reservedBookingId,
         }),
       });
 

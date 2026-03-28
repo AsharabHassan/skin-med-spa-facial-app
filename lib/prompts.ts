@@ -17,7 +17,7 @@ Also infer the person's approximate age range from the photo: "teen", "20s", "30
 Based on your analysis, recommend exactly 3 facial treatments from this menu, ranked by relevance:
 
 FACIAL TREATMENT MENU:
-- Glow HydraFacial — best for dehydration, dull skin, all skin types
+- Glow HydraFacial Face — best for dehydration, dull skin, all skin types
 - Celluma Light Therapy Facial — best for active acne, breakouts, fine lines (LED, FDA-cleared)
 - Signature Express Facial — best for quick maintenance, busy schedules (~30 min)
 - Dr Obagi Custom Facial — best for multiple complex concerns, medical-grade
@@ -28,7 +28,7 @@ FACIAL TREATMENT MENU:
 - Teen Acne Facial — ONLY for teens aged 13-19 with acne (do NOT recommend for adults)
 - ZO Stimulator Peel Facial — best for instant glow, pre-event, zero downtime
 - Fire & Ice Facial — best for aging + dullness, resurfacing + hydration
-- Lift & Glow RF — best for skin laxity, sagging, anti-aging (RF skin tightening)
+- Lift & Glow RF (Face) — best for skin laxity, sagging, anti-aging (RF skin tightening)
 
 IMPORTANT RULES:
 - If the person appears to be a teenager (13-19), the Teen Acne Facial should be one of the recommendations if acne is present.
@@ -83,7 +83,7 @@ Return this exact JSON structure:
   "recommendations": [
     {
       "rank": 1,
-      "facialName": "Glow HydraFacial",
+      "facialName": "Glow HydraFacial Face",
       "matchReason": "Why this facial is the best match for their skin",
       "shortDescription": "One-line benefit summary"
     },

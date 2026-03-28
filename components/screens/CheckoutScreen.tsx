@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useApp } from "@/lib/store";
@@ -14,26 +14,31 @@ export default function CheckoutScreen() {
   const { state, dispatch } = useApp();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
-  const topRec = state.analysisResult?.recommendations?.[0];
-  const facialMaybe = topRec ? findPricing(topRec.facialName) : undefined;
+  const selectedRec = state.analysisResult?.recommendations?.[state.selectedRecommendationIndex ?? 0];
+  const facialMaybe = selectedRec ? findPricing(selectedRec.facialName) : undefined;
 
-  if (!facialMaybe || !state.leadData) {
-    dispatch({ type: "SET_SCREEN", screen: "results" });
-    return null;
-  }
+  useEffect(() => {
+    if (!facialMaybe || !state.leadData) {
+      dispatch({ type: "SET_SCREEN", screen: "results" });
+    }
+  }, [facialMaybe, state.leadData, dispatch]);
+
+  if (!facialMaybe || !state.leadData) return null;
 
   // Narrowed: facialMaybe is FacialPricing here
   const facial = facialMaybe;
   const total = calcTotal(facial.price);
 
-  function handleDateTimeSelect(date: string, time: string) {
+  function handleDateTimeSelect(date: string, time: string, bookingId: string) {
     if (date !== selectedDate) {
       setSelectedTime(null);
     }
     setSelectedDate(date);
     if (time) setSelectedTime(time);
+    if (bookingId) setSelectedBookingId(bookingId);
     setError(null);
   }
 
@@ -98,6 +103,7 @@ export default function CheckoutScreen() {
           onSelect={handleDateTimeSelect}
           selectedDate={selectedDate}
           selectedTime={selectedTime}
+          leadData={state.leadData}
         />
 
         {error && (
@@ -113,6 +119,7 @@ export default function CheckoutScreen() {
             selectedDate={selectedDate}
             selectedTime={selectedTime}
             leadData={state.leadData}
+            bookingId={selectedBookingId}
             onSuccess={handlePaymentSuccess}
             onError={setError}
           />

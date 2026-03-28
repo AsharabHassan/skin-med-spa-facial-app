@@ -1,22 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-
-interface AvailableDate {
-  date: string;
-  slots: string[];
-}
-
-interface RecommendedSlot {
-  date: string;
-  time: string;
-  label: string;
-}
+import { useState, useEffect } from "react";
 
 interface Props {
-  onSelect: (date: string, time: string) => void;
+  onSelect: (date: string, time: string, bookingId: string) => void;
   selectedDate: string | null;
   selectedTime: string | null;
+  leadData: { firstName: string; lastName: string; email: string; phone: string };
 }
 
 function formatDateLabel(dateStr: string): string {
@@ -25,7 +15,6 @@ function formatDateLabel(dateStr: string): string {
   today.setHours(12, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
-
   if (d.toDateString() === today.toDateString()) return "Today";
   if (d.toDateString() === tomorrow.toDateString()) return "Tomorrow";
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
@@ -39,212 +28,91 @@ function formatDatePill(dateStr: string) {
   };
 }
 
-/** Pick 3 recommended slots spread across the available dates */
-function pickRecommendedSlots(availability: AvailableDate[]): RecommendedSlot[] {
-  const labels = ["Earliest Available", "Best for Afternoon", "Next Best Option"];
-  const picks: RecommendedSlot[] = [];
-
-  // 1. Earliest available slot across all days
-  for (const day of availability) {
-    if (day.slots.length > 0) {
-      picks.push({ date: day.date, time: day.slots[0], label: labels[0] });
-      break;
+/** Build next 14 days of open dates (Tue–Sat only) */
+function buildOpenDates(): string[] {
+  const dates: string[] = [];
+  const cursor = new Date();
+  cursor.setHours(12, 0, 0, 0);
+  for (let i = 0; i < 21 && dates.length < 14; i++) {
+    const day = cursor.getDay();
+    if (day !== 0 && day !== 1) { // skip Sun + Mon
+      dates.push(cursor.toISOString().split("T")[0]);
     }
+    cursor.setDate(cursor.getDate() + 1);
   }
-
-  // 2. First afternoon slot (12 PM or later) on any day
-  for (const day of availability) {
-    for (const slot of day.slots) {
-      const match = slot.match(/(\d+):.*?(AM|PM)/i);
-      if (!match) continue;
-      const hour = parseInt(match[1]);
-      const period = match[2].toUpperCase();
-      const isAfternoon = period === "PM" && hour !== 12 ? true : period === "PM" && hour === 12;
-      if (isAfternoon) {
-        const key = `${day.date}-${slot}`;
-        const alreadyPicked = picks.some((p) => `${p.date}-${p.time}` === key);
-        if (!alreadyPicked) {
-          picks.push({ date: day.date, time: slot, label: labels[1] });
-          break;
-        }
-      }
-    }
-    if (picks.length >= 2) break;
-  }
-
-  // 3. A slot on a different day than pick #1 if possible
-  if (picks.length < 3) {
-    const usedKeys = new Set(picks.map((p) => `${p.date}-${p.time}`));
-    for (const day of availability) {
-      if (picks.length > 0 && day.date === picks[0].date) continue;
-      for (const slot of day.slots) {
-        if (!usedKeys.has(`${day.date}-${slot}`)) {
-          picks.push({ date: day.date, time: slot, label: labels[2] });
-          break;
-        }
-      }
-      if (picks.length >= 3) break;
-    }
-  }
-
-  // Fallback: fill remaining from any available slot
-  if (picks.length < 3) {
-    const usedKeys = new Set(picks.map((p) => `${p.date}-${p.time}`));
-    for (const day of availability) {
-      for (const slot of day.slots) {
-        if (!usedKeys.has(`${day.date}-${slot}`)) {
-          picks.push({ date: day.date, time: slot, label: labels[picks.length] ?? "Available" });
-          usedKeys.add(`${day.date}-${slot}`);
-          if (picks.length >= 3) break;
-        }
-      }
-      if (picks.length >= 3) break;
-    }
-  }
-
-  return picks;
+  return dates;
 }
 
-export default function DateTimePicker({ onSelect, selectedDate, selectedTime }: Props) {
-  const [availability, setAvailability] = useState<AvailableDate[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [showAllSlots, setShowAllSlots] = useState(false);
+export default function DateTimePicker({ onSelect, selectedDate, selectedTime, leadData }: Props) {
+  const openDates = buildOpenDates();
 
-  useEffect(() => {
-    async function fetchSlots() {
-      try {
-        const today = new Date();
-        const startDate = today.toISOString().split("T")[0];
-        const end = new Date(today);
-        end.setDate(end.getDate() + 7);
-        const endDate = end.toISOString().split("T")[0];
+  // slots and bookingId keyed by date string
+  const [slotsByDate, setSlotsByDate] = useState<Record<string, string[]>>({});
+  const [bookingIdsByDate, setBookingIdsByDate] = useState<Record<string, string>>({});
+  const [loadingDate, setLoadingDate] = useState<string | null>(null);
+  const [errorDate, setErrorDate] = useState<string | null>(null);
 
-        const res = await fetch(`/api/availability?startDate=${startDate}&endDate=${endDate}`);
-        if (res.ok) {
-          const data = await res.json();
-          setAvailability(data.dates ?? []);
-        } else {
-          setError(true);
+  async function loadSlotsForDate(dateStr: string) {
+    if (slotsByDate[dateStr] !== undefined) return; // already loaded
+    setLoadingDate(dateStr);
+    setErrorDate(null);
+    try {
+      const res = await fetch("/api/slots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: dateStr, lead: leadData }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSlotsByDate((prev) => ({ ...prev, [dateStr]: data.slots ?? [] }));
+        if (data.bookingId) {
+          setBookingIdsByDate((prev) => ({ ...prev, [dateStr]: data.bookingId }));
         }
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
+      } else {
+        setSlotsByDate((prev) => ({ ...prev, [dateStr]: [] }));
+        setErrorDate(dateStr);
       }
+    } catch {
+      setSlotsByDate((prev) => ({ ...prev, [dateStr]: [] }));
+      setErrorDate(dateStr);
+    } finally {
+      setLoadingDate(null);
     }
-    fetchSlots();
+  }
+
+  // Load the first open date eagerly so the user sees slots immediately
+  useEffect(() => {
+    if (openDates[0]) loadSlotsForDate(openDates[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const recommended = useMemo(() => pickRecommendedSlots(availability), [availability]);
-
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        <p className="label-xs">Choose Your Time</p>
-        <div className="animate-pulse space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-gray-100 rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
+  function handleDateTap(dateStr: string) {
+    onSelect(dateStr, "", bookingIdsByDate[dateStr] ?? "");
+    loadSlotsForDate(dateStr);
   }
 
-  if (error || availability.length === 0) {
-    return (
-      <div className="space-y-3">
-        <p className="label-xs">Choose Your Time</p>
-        <div className="bg-gray-50 rounded-xl p-4 text-center">
-          <p className="font-mono text-[11px] text-gray">
-            Unable to load availability. Please call us to book.
-          </p>
-          <a href="tel:+14694913546" className="font-mono text-[11px] text-pink font-semibold mt-1 block">
-            Call Skin Med Spa →
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  // Recommended view — show 3 cards
-  if (!showAllSlots) {
-    return (
-      <div className="space-y-3">
-        <p className="label-xs">Choose Your Time</p>
-        <div className="space-y-2">
-          {recommended.map((slot, i) => {
-            const isSelected = slot.date === selectedDate && slot.time === selectedTime;
-            return (
-              <button
-                key={`${slot.date}-${slot.time}`}
-                onClick={() => onSelect(slot.date, slot.time)}
-                className={`w-full text-left rounded-xl p-4 border-2 transition-all ${
-                  isSelected
-                    ? "bg-pink/10 border-pink"
-                    : "bg-gray-50 border-transparent hover:border-pink/30"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className={`font-mono text-[9px] tracking-wider mb-1 ${isSelected ? "text-pink font-semibold" : "text-gray"}`}>
-                      {slot.label.toUpperCase()}
-                    </p>
-                    <p className="font-heading text-[15px] font-semibold text-dark">
-                      {formatDateLabel(slot.date)}
-                    </p>
-                    <p className="font-mono text-[12px] text-dark/60 mt-0.5">{slot.time}</p>
-                  </div>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected ? "border-pink bg-pink" : "border-gray-200"
-                  }`}>
-                    {isSelected && <span className="text-white text-xs">✓</span>}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        <button
-          onClick={() => setShowAllSlots(true)}
-          className="w-full text-center font-mono text-[11px] text-pink py-2 hover:underline"
-        >
-          See all available times →
-        </button>
-      </div>
-    );
-  }
-
-  // Full calendar view — date pills + time grid
-  const currentSlots = availability.find((d) => d.date === selectedDate)?.slots ?? [];
+  const activeDate = selectedDate ?? openDates[0];
+  const currentSlots = slotsByDate[activeDate] ?? null; // null = not yet loaded
+  const isLoadingSlots = loadingDate === activeDate;
+  const hasError = errorDate === activeDate;
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="label-xs">Select Date & Time</p>
-        <button
-          onClick={() => setShowAllSlots(false)}
-          className="font-mono text-[10px] text-pink hover:underline"
-        >
-          ← Recommended
-        </button>
-      </div>
+      <p className="label-xs">Choose Your Time</p>
+
+      {/* Date pill row */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-6 px-6 snap-x">
-        {availability.map((d) => {
-          const { day, date } = formatDatePill(d.date);
-          const isSelected = d.date === selectedDate;
-          const hasSlots = d.slots.length > 0;
+        {openDates.map((d) => {
+          const { day, date } = formatDatePill(d);
+          const isSelected = d === activeDate;
           return (
             <button
-              key={d.date}
-              disabled={!hasSlots}
-              onClick={() => onSelect(d.date, "")}
+              key={d}
+              onClick={() => handleDateTap(d)}
               className={`snap-start min-w-[56px] text-center py-2.5 px-2 rounded-[10px] border transition-all flex-shrink-0 ${
                 isSelected
                   ? "bg-pink/10 border-pink"
-                  : hasSlots
-                  ? "bg-gray-50 border-gray-100 hover:border-pink/30"
-                  : "bg-gray-50 border-gray-50 opacity-40 cursor-not-allowed"
+                  : "bg-gray-50 border-gray-100 hover:border-pink/30"
               }`}
             >
               <p className={`font-mono text-[9px] ${isSelected ? "text-pink font-semibold" : "text-gray"}`}>{day}</p>
@@ -253,26 +121,56 @@ export default function DateTimePicker({ onSelect, selectedDate, selectedTime }:
           );
         })}
       </div>
-      {selectedDate && (
+
+      {/* Selected date label */}
+      {activeDate && (
+        <p className="font-mono text-[10px] text-gray uppercase tracking-wider">
+          {formatDateLabel(activeDate)}
+        </p>
+      )}
+
+      {/* Slots grid */}
+      {isLoadingSlots ? (
+        <div className="animate-pulse grid grid-cols-3 gap-1.5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-10 bg-gray-100 rounded-lg" />
+          ))}
+        </div>
+      ) : hasError ? (
+        <div className="bg-gray-50 rounded-xl p-4 text-center">
+          <p className="font-mono text-[11px] text-gray">
+            Could not load availability. Please try another day or{" "}
+            <a href="tel:+14694913546" className="text-pink font-semibold">call us</a>.
+          </p>
+        </div>
+      ) : currentSlots === null ? (
+        <div className="animate-pulse grid grid-cols-3 gap-1.5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-10 bg-gray-100 rounded-lg" />
+          ))}
+        </div>
+      ) : currentSlots.length === 0 ? (
+        <div className="bg-gray-50 rounded-xl p-4 text-center">
+          <p className="font-mono text-[11px] text-gray">No availability on this day. Please try another date.</p>
+        </div>
+      ) : (
         <div className="grid grid-cols-3 gap-1.5">
-          {currentSlots.length > 0 ? (
-            currentSlots.map((slot) => {
-              const isSelected = slot === selectedTime;
-              return (
-                <button
-                  key={slot}
-                  onClick={() => onSelect(selectedDate, slot)}
-                  className={`text-center py-2 rounded-lg border transition-all ${
-                    isSelected ? "bg-pink/10 border-pink" : "bg-gray-50 border-gray-100 hover:border-pink/30"
-                  }`}
-                >
-                  <span className={`font-mono text-[11px] ${isSelected ? "text-dark font-semibold" : "text-dark"}`}>{slot}</span>
-                </button>
-              );
-            })
-          ) : (
-            <p className="col-span-3 font-mono text-[11px] text-gray text-center py-4">No available times for this date</p>
-          )}
+          {currentSlots.map((slot) => {
+            const isSelected = slot === selectedTime && activeDate === selectedDate;
+            return (
+              <button
+                key={slot}
+                onClick={() => onSelect(activeDate, slot, bookingIdsByDate[activeDate] ?? "")}
+                className={`text-center py-2.5 rounded-lg border transition-all ${
+                  isSelected ? "bg-pink/10 border-pink" : "bg-gray-50 border-gray-100 hover:border-pink/30"
+                }`}
+              >
+                <span className={`font-mono text-[11px] ${isSelected ? "text-dark font-semibold" : "text-dark"}`}>
+                  {slot}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

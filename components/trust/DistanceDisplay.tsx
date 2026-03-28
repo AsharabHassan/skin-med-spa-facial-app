@@ -30,9 +30,15 @@ export default function DistanceDisplay() {
           );
           if (res.ok) {
             const json = await res.json();
-            if (json.durationText) {
+            if (json?.durationText) {
               setData(json);
             } else {
+              // Distance failed but we have user coords — still show map with user pin
+              setData({
+                durationText: "",
+                distanceText: "",
+                staticMapUrl: `/api/static-map?userLat=${position.coords.latitude}&userLng=${position.coords.longitude}`,
+              });
               setLocationDenied(true);
             }
           } else {
@@ -91,15 +97,16 @@ export default function DistanceDisplay() {
           </div>
         )}
 
-        {/* Static map (URL always from server to protect API key) */}
+        {/* Static map — show clinic pin always, user pin when available */}
         <div className="mt-3 rounded-lg overflow-hidden h-[120px] bg-gray-100">
-          {data?.staticMapUrl ? (
-            <img src={data.staticMapUrl} alt="Map to clinic" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="font-mono text-[10px] text-gray">{CLINIC_ADDRESS}</span>
-            </div>
-          )}
+          <img
+            src={data?.staticMapUrl ?? "/api/static-map"}
+            alt="Map to clinic"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
         </div>
       </div>
     </div>
