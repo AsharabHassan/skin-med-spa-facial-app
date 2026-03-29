@@ -23,7 +23,7 @@ function serviceId(): string {
 }
 
 function therapistId(): string {
-  return process.env.ZENOTI_THERAPIST_ID ?? "8dabd448-c466-456d-9b92-39a03ea6aa3a";
+  return process.env.ZENOTI_THERAPIST_ID ?? "ac204833-32bc-4dc8-90a2-d6fa2b33ff75";
 }
 
 // ─── Date helpers ────────────────────────────────────────────────────────────
