@@ -28,14 +28,14 @@ function formatDatePill(dateStr: string) {
   };
 }
 
-/** Build next 14 days of open dates (Tue–Sat only) */
+/** Build next 8 available dates (Wed + Fri only) */
 function buildOpenDates(): string[] {
   const dates: string[] = [];
   const cursor = new Date();
   cursor.setHours(12, 0, 0, 0);
-  for (let i = 0; i < 21 && dates.length < 14; i++) {
+  for (let i = 0; i < 60 && dates.length < 8; i++) {
     const day = cursor.getDay();
-    if (day !== 0 && day !== 1) { // skip Sun + Mon
+    if (day === 3 || day === 5) { // Wed + Fri only
       dates.push(cursor.toISOString().split("T")[0]);
     }
     cursor.setDate(cursor.getDate() + 1);

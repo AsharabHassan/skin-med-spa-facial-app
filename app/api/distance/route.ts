@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 const CLINIC_LAT = process.env.NEXT_PUBLIC_CLINIC_LAT ?? "33.1972";
 const CLINIC_LNG = process.env.NEXT_PUBLIC_CLINIC_LNG ?? "-96.6397";
 
