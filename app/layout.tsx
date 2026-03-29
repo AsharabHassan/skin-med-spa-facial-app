@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Raleway, Lora } from "next/font/google";
+import { Mulish, Castoro } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const raleway = Raleway({
+const mulish = Mulish({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-raleway",
+  weight: ["300", "400", "600", "700", "800"],
+  variable: "--font-mulish",
   display: "swap",
 });
 
-const lora = Lora({
+const castoro = Castoro({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body-serif",
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-castoro",
   display: "swap",
 });
 
@@ -34,7 +35,7 @@ const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${raleway.variable} ${lora.variable}`}>
+    <html lang="en" className={`${mulish.variable} ${castoro.variable}`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="theme-color" content="#FFFFFF" />

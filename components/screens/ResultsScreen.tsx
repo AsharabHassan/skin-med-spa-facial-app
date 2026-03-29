@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 import { useApp } from "@/lib/store";
 import MembershipPopup from "@/components/MembershipPopup";
 import VideoTestimonials from "@/components/trust/VideoTestimonials";
+import BeforeAfter from "@/components/trust/BeforeAfter";
 import ClinicPhotoGrid from "@/components/trust/ClinicPhotoGrid";
+import AwardsStrip from "@/components/trust/AwardsStrip";
 import DistanceDisplay from "@/components/trust/DistanceDisplay";
 import { findPricing, formatCents } from "@/lib/pricing";
 
@@ -19,7 +21,7 @@ const RANK_LABELS = ["BEST MATCH", "ALSO GREAT", "CONSIDER"];
 
 export default function ResultsScreen() {
   const { state, dispatch } = useApp();
-  const { analysisResult, imageDataUrl, leadData, membershipPopupShown, selectedRecommendationIndex } = state;
+  const { analysisResult, imageDataUrl, leadData, membershipPopupShown, selectedRecommendationIndex, membershipSelected } = state;
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -139,9 +141,68 @@ export default function ResultsScreen() {
           })}
         </div>
 
+        {/* Membership card */}
+        <button
+          onClick={() => dispatch({ type: "SELECT_MEMBERSHIP" })}
+          className={`w-full text-left rounded-xl p-4 border-2 transition-all ${
+            membershipSelected
+              ? "bg-teal/10 border-teal"
+              : "bg-gray-50 border-transparent hover:border-teal/30"
+          }`}
+        >
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <p className={`font-mono text-[9px] tracking-wider ${membershipSelected ? "text-teal font-semibold" : "text-gray"}`}>
+                  MEMBERSHIP
+                </p>
+                <span className={`font-mono text-[8px] px-1.5 py-0.5 rounded-full tracking-wider ${
+                  membershipSelected ? "bg-teal text-white" : "bg-teal/20 text-teal"
+                }`}>
+                  BEST VALUE
+                </span>
+                {membershipSelected && (
+                  <span className="font-mono text-[8px] bg-teal text-white px-1.5 py-0.5 rounded-full tracking-wider">
+                    SELECTED
+                  </span>
+                )}
+              </div>
+              <p className="font-heading text-[1rem] font-semibold text-dark">Facial Membership</p>
+              <p className="font-mono text-[10px] text-gray mt-1">Monthly facial + exclusive member perks</p>
+              <div className="mt-2 space-y-1">
+                {[
+                  "Monthly facial of your choice",
+                  "Priority booking & scheduling",
+                  "Exclusive member-only pricing",
+                  "Skincare product discounts",
+                  "Access to all facials incl. Ultimate Bacial",
+                ].map((b) => (
+                  <div key={b} className="flex items-center gap-1.5">
+                    <span className="text-teal text-[10px] flex-shrink-0">✓</span>
+                    <span className="font-mono text-[9px] text-dark/60">{b}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
+              <div className="text-right">
+                <span className="font-heading text-[0.85rem] font-semibold text-dark">$129</span>
+                <span className="font-mono text-[9px] text-gray">/mo</span>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                membershipSelected ? "border-teal bg-teal" : "border-gray-300"
+              }`}>
+                {membershipSelected && <span className="text-white text-[10px]">✓</span>}
+              </div>
+            </div>
+          </div>
+        </button>
+
         {/* Trust elements */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-pink to-transparent my-2" />
         <VideoTestimonials />
+        <BeforeAfter />
+        <AwardsStrip />
         <ClinicPhotoGrid />
         <DistanceDisplay />
 

@@ -11,7 +11,7 @@
   body {
     background-color: #FFFFFF;
     color: #323232;
-    font-family: var(--font-body-serif), Georgia, serif;
+    font-family: var(--font-mulish), sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
@@ -85,14 +85,19 @@
     transform: scale(0.99);
   }
 
+  /* Castoro headings — italic by default for editorial feel */
+  .font-heading {
+    font-style: italic;
+  }
+
   /* Labels */
   .label-xs {
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: var(--font-mulish), sans-serif;
     font-size: 9px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: #9E9E9E;
-    font-weight: 400;
+    font-weight: 600;
   }
 
   /* Form inputs */

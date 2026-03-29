@@ -19,6 +19,13 @@ export const FACIAL_PRICING: FacialPricing[] = [
   { facialId: "ultimate-bacial",             facialName: "Ultimate Bacial",                     price: 12500, duration: "45 min" },
 ];
 
+export const MEMBERSHIP_PRICING: FacialPricing = {
+  facialId: "membership",
+  facialName: "Facial Membership",
+  price: 12900,
+  duration: "Monthly",
+};
+
 /** Look up pricing by facial name — exact match first, then partial contains fallback */
 export function findPricing(facialName: string): FacialPricing | undefined {
   const lower = facialName.toLowerCase();

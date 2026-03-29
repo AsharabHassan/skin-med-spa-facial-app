@@ -6,7 +6,7 @@ import { useState } from "react";
 const PHOTOS = [
   { src: "/clinic/reception.jpg", alt: "Reception Area", fallbackGradient: "from-teal to-teal-dark" },
   { src: "/clinic/treatment-room.jpg", alt: "Treatment Room", fallbackGradient: "from-coral to-pink" },
-  { src: "/clinic/hydrafacial-suite.jpg", alt: "Hydrafacial Suite", fallbackGradient: "from-pink-dark to-pink" },
+  { src: "/clinic/exterior.jpg", alt: "Our Clinic", fallbackGradient: "from-pink-dark to-pink" },
   { src: "/clinic/our-team.jpg", alt: "Our Team", fallbackGradient: "from-pink to-coral" },
 ];
 

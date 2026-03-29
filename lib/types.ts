@@ -45,6 +45,7 @@ export interface AppState {
   leadData: LeadData | null;
   membershipPopupShown: boolean;
   selectedRecommendationIndex: number;
+  membershipSelected: boolean;
   checkoutData: CheckoutData | null;
   bookingConfirmation: BookingConfirmation | null;
 }

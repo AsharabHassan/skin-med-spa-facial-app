@@ -25,8 +25,8 @@ const config: Config = {
         blush: "#FFF0F5",
       },
       fontFamily: {
-        heading: ["var(--font-raleway)", "sans-serif"],
-        body: ["var(--font-body-serif)", "Georgia", "serif"],
+        heading: ["var(--font-castoro)", "Georgia", "serif"],
+        body: ["var(--font-mulish)", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "monospace"],
       },
       animation: {

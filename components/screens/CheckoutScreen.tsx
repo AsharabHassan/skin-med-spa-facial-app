@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useApp } from "@/lib/store";
-import { findPricing, calcTax, calcTotal } from "@/lib/pricing";
+import { findPricing, calcTax, calcTotal, MEMBERSHIP_PRICING } from "@/lib/pricing";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import DateTimePicker from "@/components/checkout/DateTimePicker";
 import StripePaymentForm from "@/components/checkout/StripePaymentForm";
@@ -17,8 +17,11 @@ export default function CheckoutScreen() {
   const [selectedBookingId, setSelectedBookingId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
+  const isMembership = state.membershipSelected === true;
   const selectedRec = state.analysisResult?.recommendations?.[state.selectedRecommendationIndex ?? 0];
-  const facialMaybe = selectedRec ? findPricing(selectedRec.facialName) : undefined;
+  const facialMaybe = isMembership
+    ? MEMBERSHIP_PRICING
+    : selectedRec ? findPricing(selectedRec.facialName) : undefined;
 
   useEffect(() => {
     if (!facialMaybe || !state.leadData) {
@@ -28,7 +31,6 @@ export default function CheckoutScreen() {
 
   if (!facialMaybe || !state.leadData) return null;
 
-  // Narrowed: facialMaybe is FacialPricing here
   const facial = facialMaybe;
   const total = calcTotal(facial.price);
 
@@ -97,7 +99,7 @@ export default function CheckoutScreen() {
           Complete<br />Your <span className="text-pink">Booking.</span>
         </h2>
 
-        <OrderSummary facial={facial} />
+        <OrderSummary facial={facial} isMembership={isMembership} />
 
         <DateTimePicker
           onSelect={handleDateTimeSelect}

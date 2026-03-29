@@ -10,6 +10,7 @@ type Action =
   | { type: "SET_LEAD"; lead: LeadData }
   | { type: "SHOW_MEMBERSHIP_POPUP" }
   | { type: "SET_SELECTED_RECOMMENDATION"; index: number }
+  | { type: "SELECT_MEMBERSHIP" }
   | { type: "RESET" }
   | { type: "SET_CHECKOUT_DATA"; data: CheckoutData }
   | { type: "SET_BOOKING_CONFIRMATION"; confirmation: BookingConfirmation };
@@ -21,6 +22,7 @@ const initialState: AppState = {
   leadData: null,
   membershipPopupShown: false,
   selectedRecommendationIndex: 0,
+  membershipSelected: false,
   checkoutData: null,
   bookingConfirmation: null,
 };
@@ -38,7 +40,9 @@ function reducer(state: AppState, action: Action): AppState {
     case "SHOW_MEMBERSHIP_POPUP":
       return { ...state, membershipPopupShown: true };
     case "SET_SELECTED_RECOMMENDATION":
-      return { ...state, selectedRecommendationIndex: action.index };
+      return { ...state, selectedRecommendationIndex: action.index, membershipSelected: false };
+    case "SELECT_MEMBERSHIP":
+      return { ...state, membershipSelected: true, selectedRecommendationIndex: -1 };
     case "SET_CHECKOUT_DATA":
       return { ...state, checkoutData: action.data };
     case "SET_BOOKING_CONFIRMATION":

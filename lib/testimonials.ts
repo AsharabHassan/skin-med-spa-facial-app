@@ -5,24 +5,23 @@ export interface Testimonial {
   quote: string;
 }
 
-// Replace these with real URLs from the clinic's social media
 export const TESTIMONIALS: Testimonial[] = [
   {
     platform: "instagram",
-    embedUrl: "https://www.instagram.com/reel/REPLACE_WITH_REAL_ID/",
-    handle: "@skinmedspa_client1",
-    quote: "My skin has never looked better after the HydraFacial!",
-  },
-  {
-    platform: "tiktok",
-    embedUrl: "https://www.tiktok.com/@REPLACE_WITH_REAL_HANDLE/video/REPLACE_WITH_REAL_ID",
-    handle: "@skinmedspa_client2",
-    quote: "Best facial experience in McKinney, hands down.",
+    embedUrl: "https://www.instagram.com/reel/C432KPIRPqt/",
+    handle: "@skinmedspalaser",
+    quote: "Real client results — see the transformation!",
   },
   {
     platform: "instagram",
-    embedUrl: "https://www.instagram.com/reel/REPLACE_WITH_REAL_ID/",
-    handle: "@skinmedspa_client3",
-    quote: "Total transformation in just one session!",
+    embedUrl: "https://www.instagram.com/reel/DHCyMMLoyZn/",
+    handle: "@skinmedspalaser",
+    quote: "Watch the glow-up live on Instagram.",
+  },
+  {
+    platform: "instagram",
+    embedUrl: "https://www.instagram.com/p/C10OL4Noh_x/",
+    handle: "@skinmedspalaser",
+    quote: "Before & after — glowing skin speaks for itself.",
   },
 ];

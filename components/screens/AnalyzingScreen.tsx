@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/lib/store";
+import { REVIEWS } from "@/lib/reviews";
 
 const DIMENSIONS = [
   { id: "01", name: "TEXTURE & PORES" },
@@ -15,6 +16,7 @@ const DIMENSIONS = [
 export default function AnalyzingScreen() {
   const { state, dispatch } = useApp();
   const [activeDim, setActiveDim] = useState(0);
+  const [activeReview, setActiveReview] = useState(0);
   const [dots, setDots] = useState(".");
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +66,10 @@ export default function AnalyzingScreen() {
     const dotInterval = setInterval(() => {
       setDots((d) => (d.length >= 3 ? "." : d + "."));
     }, 400);
-    return () => { clearInterval(dimInterval); clearInterval(dotInterval); };
+    const reviewInterval = setInterval(() => {
+      setActiveReview((p) => (p + 1) % REVIEWS.length);
+    }, 4000);
+    return () => { clearInterval(dimInterval); clearInterval(dotInterval); clearInterval(reviewInterval); };
   }, []);
 
   return (
@@ -133,6 +138,53 @@ export default function AnalyzingScreen() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Testimonial carousel */}
+        <div className="relative overflow-hidden rounded-xl border border-gray-100 bg-white/60 backdrop-blur-sm px-4 py-3 min-h-[90px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeReview}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35 }}
+            >
+              {/* Stars */}
+              <div className="flex gap-0.5 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} width="10" height="10" viewBox="0 0 10 10" fill="#F48FB1">
+                    <path d="M5 1l1.2 2.5L9 3.8 7 5.7l.5 2.8L5 7.2 2.5 8.5 3 5.7 1 3.8l2.8-.3z"/>
+                  </svg>
+                ))}
+              </div>
+              <p className="font-heading text-[0.85rem] italic text-dark/80 leading-snug mb-2">
+                "{REVIEWS[activeReview].quote}"
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="font-body text-[10px] font-600 text-dark/60">
+                  — {REVIEWS[activeReview].name}
+                </span>
+                <span className="font-mono text-[8px] text-pink/60 tracking-wide uppercase">
+                  {REVIEWS[activeReview].treatment}
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          {/* Dot indicators */}
+          <div className="flex gap-1 justify-center mt-2">
+            {REVIEWS.map((_, i) => (
+              <div
+                key={i}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === activeReview ? 16 : 4,
+                  height: 4,
+                  background: i === activeReview ? "#F48FB1" : "#e0e0e0",
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Dimension readout */}
