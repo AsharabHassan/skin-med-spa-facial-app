@@ -1,7 +1,7 @@
 "use client";
 
 import { FacialPricing } from "@/lib/types";
-import { calcTax, calcTotal, formatCents } from "@/lib/pricing";
+import { formatCents } from "@/lib/pricing";
 
 interface Props {
   facial: FacialPricing;
@@ -9,9 +9,6 @@ interface Props {
 }
 
 export default function OrderSummary({ facial, isMembership = false }: Props) {
-  const tax = calcTax(facial.price);
-  const total = calcTotal(facial.price);
-
   if (isMembership) {
     return (
       <div className="space-y-3">
@@ -40,20 +37,9 @@ export default function OrderSummary({ facial, isMembership = false }: Props) {
             ))}
           </div>
           <div className="h-px bg-teal/10 my-3" />
-          <div className="space-y-1.5">
-            <div className="flex justify-between">
-              <span className="font-mono text-[11px] text-dark/60">Membership (first month)</span>
-              <span className="font-mono text-[13px] font-semibold text-dark">{formatCents(facial.price)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-mono text-[11px] text-dark/60">Tax (8.25%)</span>
-              <span className="font-mono text-[13px] text-dark">{formatCents(tax)}</span>
-            </div>
-            <div className="h-px bg-teal/10 my-1" />
-            <div className="flex justify-between">
-              <span className="font-mono text-[13px] font-bold text-dark">Total Today</span>
-              <span className="font-heading text-[18px] font-bold text-teal">{formatCents(total)}</span>
-            </div>
+          <div className="flex justify-between">
+            <span className="font-mono text-[13px] font-bold text-dark">Total Today</span>
+            <span className="font-heading text-[18px] font-bold text-teal">{formatCents(facial.price)}</span>
           </div>
         </div>
       </div>
@@ -72,20 +58,9 @@ export default function OrderSummary({ facial, isMembership = false }: Props) {
           </div>
         </div>
         <div className="h-px bg-pink/10 my-3" />
-        <div className="space-y-1.5">
-          <div className="flex justify-between">
-            <span className="font-mono text-[11px] text-dark/60">Facial Treatment</span>
-            <span className="font-mono text-[13px] font-semibold text-dark">{formatCents(facial.price)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-mono text-[11px] text-dark/60">Tax (8.25%)</span>
-            <span className="font-mono text-[13px] text-dark">{formatCents(tax)}</span>
-          </div>
-          <div className="h-px bg-pink/10 my-1" />
-          <div className="flex justify-between">
-            <span className="font-mono text-[13px] font-bold text-dark">Total</span>
-            <span className="font-heading text-[18px] font-bold text-pink">{formatCents(total)}</span>
-          </div>
+        <div className="flex justify-between">
+          <span className="font-mono text-[13px] font-bold text-dark">Total</span>
+          <span className="font-heading text-[18px] font-bold text-pink">{formatCents(facial.price)}</span>
         </div>
       </div>
     </div>

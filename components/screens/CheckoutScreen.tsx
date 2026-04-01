@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useApp } from "@/lib/store";
-import { findPricing, calcTax, calcTotal, MEMBERSHIP_PRICING } from "@/lib/pricing";
+import { findPricing, MEMBERSHIP_PRICING } from "@/lib/pricing";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import DateTimePicker from "@/components/checkout/DateTimePicker";
 import StripePaymentForm from "@/components/checkout/StripePaymentForm";
@@ -32,7 +32,7 @@ export default function CheckoutScreen() {
   if (!facialMaybe || !state.leadData) return null;
 
   const facial = facialMaybe;
-  const total = calcTotal(facial.price);
+  const total = facial.price;
 
   function handleDateTimeSelect(date: string, time: string, bookingId: string) {
     if (date !== selectedDate) {
@@ -55,7 +55,7 @@ export default function CheckoutScreen() {
         facial,
         selectedDate: selectedDate!,
         selectedTime: selectedTime!,
-        tax: calcTax(facial.price),
+        tax: 0,
         total,
       },
     });

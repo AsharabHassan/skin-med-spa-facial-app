@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { findOrCreateContact } from "@/lib/ghl";
 import { reserveSlotForPayment, reserveSlotOnBooking } from "@/lib/zenoti";
-import { FACIAL_PRICING, calcTotal } from "@/lib/pricing";
+import { FACIAL_PRICING } from "@/lib/pricing";
 
 function getStripeClient() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     if (!facial) {
       return NextResponse.json({ error: "Unknown facial" }, { status: 400 });
     }
-    const amount = calcTotal(facial.price);
+    const amount = facial.price;
 
     // Reserve the Zenoti slot BEFORE charging the card.
     // If a bookingId from the availability check is provided, reuse that booking.

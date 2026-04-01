@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { updateContact, triggerWorkflow } from "@/lib/ghl";
 import { createAppointment, confirmReservedBooking } from "@/lib/zenoti";
 import { FACIAL_PRICING } from "@/lib/pricing";
 
@@ -71,22 +70,37 @@ export async function POST(req: NextRequest) {
       }, { status: 207 });
     }
 
-    // Step 2: GHL update — non-blocking, never fails the response
+    // Step 2: GHL payment webhook — non-blocking, never fails the response
     try {
-      if (ghlContactId) {
-        await updateContact(ghlContactId, {
-          last_payment_amount: (paymentIntent.amount / 100).toFixed(2),
-          last_payment_date: new Date().toISOString(),
-          last_facial_booked: facialName,
-          stripe_payment_id: paymentIntentId,
+      const webhookUrl = process.env.GHL_PAYMENT_WORKFLOW_ID;
+      if (webhookUrl) {
+        const webhookRes = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: lead?.firstName ?? "",
+            lastName: lead?.lastName ?? "",
+            email: lead?.email ?? "",
+            phone: lead?.phone ?? "",
+            facialName,
+            facialId,
+            appointmentDate: date,
+            appointmentTime: time,
+            paymentAmount: (paymentIntent.amount / 100).toFixed(2),
+            paymentId: paymentIntentId,
+            bookingId: appointmentId,
+            confirmationNumber,
+            source: "Skin Med Spa Facial Analysis App",
+            event: "payment_completed",
+            completedAt: new Date().toISOString(),
+          }),
         });
-        const workflowId = process.env.GHL_PAYMENT_WORKFLOW_ID;
-        if (workflowId) {
-          await triggerWorkflow(workflowId, ghlContactId);
+        if (!webhookRes.ok) {
+          console.error("GHL payment webhook failed:", webhookRes.status);
         }
       }
     } catch (ghlError) {
-      console.error("GHL update (non-fatal, booking confirmed):", ghlError);
+      console.error("GHL webhook (non-fatal, booking confirmed):", ghlError);
     }
 
     return NextResponse.json({
