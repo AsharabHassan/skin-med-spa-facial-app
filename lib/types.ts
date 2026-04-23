@@ -3,9 +3,7 @@ export type Screen =
   | "capture"
   | "analyzing"
   | "gate"
-  | "results"
-  | "checkout"
-  | "confirmation";
+  | "results";
 
 export interface SkinDimension {
   id: number;
@@ -46,8 +44,6 @@ export interface AppState {
   membershipPopupShown: boolean;
   selectedRecommendationIndex: number;
   membershipSelected: boolean;
-  checkoutData: CheckoutData | null;
-  bookingConfirmation: BookingConfirmation | null;
 }
 
 export interface FacialPricing {
@@ -55,23 +51,4 @@ export interface FacialPricing {
   facialName: string;
   price: number; // in cents (e.g., 15000 = $150.00)
   duration: string;
-}
-
-export interface CheckoutData {
-  facial: FacialPricing;
-  selectedDate: string;
-  selectedTime: string;
-  tax: number;    // in cents
-  total: number;  // in cents
-  ghlContactId?: string;
-}
-
-export interface BookingConfirmation {
-  confirmationNumber: string;
-  appointmentId: string;
-  facialName: string;
-  date: string;
-  time: string;
-  amountCharged: number; // in cents
-  cardLast4: string;
 }

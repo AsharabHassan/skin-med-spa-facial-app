@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useReducer, ReactNode } from "react";
-import { AppState, Screen, SkinAnalysisResult, LeadData, CheckoutData, BookingConfirmation } from "./types";
+import { AppState, Screen, SkinAnalysisResult, LeadData } from "./types";
 
 type Action =
   | { type: "SET_SCREEN"; screen: Screen }
@@ -11,9 +11,7 @@ type Action =
   | { type: "SHOW_MEMBERSHIP_POPUP" }
   | { type: "SET_SELECTED_RECOMMENDATION"; index: number }
   | { type: "SELECT_MEMBERSHIP" }
-  | { type: "RESET" }
-  | { type: "SET_CHECKOUT_DATA"; data: CheckoutData }
-  | { type: "SET_BOOKING_CONFIRMATION"; confirmation: BookingConfirmation };
+  | { type: "RESET" };
 
 const initialState: AppState = {
   screen: "landing",
@@ -23,8 +21,6 @@ const initialState: AppState = {
   membershipPopupShown: false,
   selectedRecommendationIndex: 0,
   membershipSelected: false,
-  checkoutData: null,
-  bookingConfirmation: null,
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -43,10 +39,6 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, selectedRecommendationIndex: action.index, membershipSelected: false };
     case "SELECT_MEMBERSHIP":
       return { ...state, membershipSelected: true, selectedRecommendationIndex: -1 };
-    case "SET_CHECKOUT_DATA":
-      return { ...state, checkoutData: action.data };
-    case "SET_BOOKING_CONFIRMATION":
-      return { ...state, bookingConfirmation: action.confirmation };
     case "RESET":
       return initialState;
     default:

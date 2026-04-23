@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 interface Props {
   onDismiss: () => void;
-  onAccept: () => void;
+  bookingUrl: string;
 }
 
 const BENEFITS = [
@@ -15,7 +15,7 @@ const BENEFITS = [
   "Access to all facials including Ultimate Bacial",
 ];
 
-export default function MembershipPopup({ onDismiss, onAccept }: Props) {
+export default function MembershipPopup({ onDismiss, bookingUrl }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -48,10 +48,9 @@ export default function MembershipPopup({ onDismiss, onAccept }: Props) {
         {/* Headline */}
         <div className="text-center mb-5">
           <h3 className="font-heading text-[1.4rem] font-light text-dark">Facial Membership</h3>
-          <div className="mt-2">
-            <span className="font-heading text-[2.2rem] font-semibold text-pink">$129</span>
-            <span className="text-gray text-sm">/month</span>
-          </div>
+          <p className="font-mono text-[10px] text-gray mt-2 tracking-wider uppercase">
+            Monthly Facial + Member Perks
+          </p>
         </div>
 
         {/* Benefits */}
@@ -65,9 +64,15 @@ export default function MembershipPopup({ onDismiss, onAccept }: Props) {
         </div>
 
         {/* CTAs */}
-        <button className="btn-teal w-full mb-3" onClick={onAccept}>
-          Learn More at Consultation →
-        </button>
+        <a
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onDismiss}
+          className="btn-teal w-full mb-3 text-center block"
+        >
+          Book Free Online Consultation →
+        </a>
         <button
           className="w-full text-center font-mono text-[11px] text-gray hover:text-dark transition-colors py-2"
           onClick={onDismiss}

@@ -9,7 +9,6 @@ import BeforeAfter from "@/components/trust/BeforeAfter";
 import ClinicPhotoGrid from "@/components/trust/ClinicPhotoGrid";
 import AwardsStrip from "@/components/trust/AwardsStrip";
 import DistanceDisplay from "@/components/trust/DistanceDisplay";
-import { findPricing, formatCents } from "@/lib/pricing";
 
 const SEVERITY_PILL: Record<string, string> = {
   healthy: "pill-healthy",
@@ -23,6 +22,8 @@ export default function ResultsScreen() {
   const { state, dispatch } = useApp();
   const { analysisResult, imageDataUrl, leadData, membershipPopupShown, selectedRecommendationIndex, membershipSelected } = state;
   const [showPopup, setShowPopup] = useState(false);
+
+  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "#";
 
   useEffect(() => {
     if (membershipPopupShown) return;
@@ -96,7 +97,7 @@ export default function ResultsScreen() {
         {/* Recommendations */}
         <div className="space-y-3">
           <p className="label-xs mb-1">Recommended For You</p>
-          <p className="font-mono text-[10px] text-gray mb-3">Tap a treatment to select it, then proceed to checkout.</p>
+          <p className="font-mono text-[10px] text-gray mb-3">Tap a treatment to explore it. Book your free consultation below.</p>
           {analysisResult.recommendations.map((rec, i) => {
             const isSelected = i === selectedRecommendationIndex;
             return (
@@ -126,9 +127,6 @@ export default function ResultsScreen() {
                     <p className="font-body text-[11px] text-dark/50 mt-1.5 leading-relaxed">{rec.matchReason}</p>
                   </div>
                   <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
-                    <span className="font-heading text-[0.85rem] font-semibold text-dark">
-                      {(() => { const p = findPricing(rec.facialName); return p ? formatCents(p.price) : ""; })()}
-                    </span>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                       isSelected ? "border-pink bg-pink" : "border-gray-300"
                     }`}>
@@ -185,10 +183,6 @@ export default function ResultsScreen() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
-              <div className="text-right">
-                <span className="font-heading text-[0.85rem] font-semibold text-dark">$129</span>
-                <span className="font-mono text-[9px] text-gray">/mo</span>
-              </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                 membershipSelected ? "border-teal bg-teal" : "border-gray-300"
               }`}>
@@ -213,22 +207,21 @@ export default function ResultsScreen() {
         </p>
 
         {/* CTA */}
-        <button
-          className="btn-pink w-full"
-          onClick={() => dispatch({ type: "SET_SCREEN", screen: "checkout" })}
+        <a
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-pink w-full text-center block"
         >
-          Proceed to Checkout →
-        </button>
+          Book Free Online Consultation →
+        </a>
       </motion.div>
 
       {/* Membership popup */}
       {showPopup && (
         <MembershipPopup
           onDismiss={() => setShowPopup(false)}
-          onAccept={() => {
-            setShowPopup(false);
-            dispatch({ type: "SET_SCREEN", screen: "checkout" });
-          }}
+          bookingUrl={bookingUrl}
         />
       )}
     </div>
