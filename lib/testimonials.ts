@@ -8,9 +8,9 @@ export interface Testimonial {
 export const TESTIMONIALS: Testimonial[] = [
   {
     platform: "instagram",
-    embedUrl: "https://www.instagram.com/reel/C432KPIRPqt/",
+    embedUrl: "https://www.instagram.com/p/C10OL4Noh_x/",
     handle: "@skinmedspalaser",
-    quote: "Real client results — see the transformation!",
+    quote: "Before & after — glowing skin speaks for itself.",
   },
   {
     platform: "instagram",
@@ -20,8 +20,8 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     platform: "instagram",
-    embedUrl: "https://www.instagram.com/p/C10OL4Noh_x/",
+    embedUrl: "https://www.instagram.com/reel/C432KPIRPqt/",
     handle: "@skinmedspalaser",
-    quote: "Before & after — glowing skin speaks for itself.",
+    quote: "Real client results — see the transformation!",
   },
 ];
